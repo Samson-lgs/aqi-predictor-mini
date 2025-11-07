@@ -24,7 +24,12 @@ class OpenWeatherAPI:
             
             if response.status_code == 200:
                 data = response.json()
-                pollution = data.get("list", [{}]).get("components", {})
+                # Get the first item from the list, then access components
+                pollution_list = data.get("list", [])
+                if pollution_list and len(pollution_list) > 0:
+                    pollution = pollution_list[0].get("components", {})
+                else:
+                    pollution = {}
                 
                 return {
                     "city": city,
