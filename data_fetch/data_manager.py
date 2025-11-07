@@ -6,10 +6,15 @@ import time
 import json
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from data_fetch.openweather_api import OpenWeatherAPI
-from data_fetch.iqair_api import IQAirAPI
-from data_fetch.cpcb_api import CPCBAPI
+
+# Add project root to path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from openweather_api import OpenWeatherAPI
+from iqair_api import IQAirAPI
+from cpcb_api import CPCBAPI
 from config.config import DATABASE_URL, CITIES
 
 class DataManager:

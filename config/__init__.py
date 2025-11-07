@@ -1,0 +1,30 @@
+# AQI Predictor Configuration Package
+from .config import (
+    OPENWEATHER_API_KEY,
+    IQAIR_API_KEY,
+    CPCB_API_KEY,
+    DATABASE_URL,
+    CITIES,
+    FORECAST_HOURS,
+    MODEL_PARAMS,
+    POLLUTANTS,
+    WEATHER_FEATURES,
+    TARGET_R2,
+    TARGET_RMSE,
+    TARGET_MAE
+)
+
+__all__ = [
+    'OPENWEATHER_API_KEY',
+    'IQAIR_API_KEY',
+    'CPCB_API_KEY',
+    'DATABASE_URL',
+    'CITIES',
+    'FORECAST_HOURS',
+    'MODEL_PARAMS',
+    'POLLUTANTS',
+    'WEATHER_FEATURES',
+    'TARGET_R2',
+    'TARGET_RMSE',
+    'TARGET_MAE'
+]
