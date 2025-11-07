@@ -9,18 +9,11 @@ class IQAirAPI:
         self.base_url = "http://api.waqi.info"
         
     def fetch_city_data(self, city):
-        """Fetch AQI data from IQAir/WAQI for a city"""
         try:
-            # Map city names to WAQI city codes
             city_map = {
-                "Delhi": "delhi",
-                "Mumbai": "mumbai",
-                "Bangalore": "bangalore",
-                "Kolkata": "kolkata",
-                "Chennai": "chennai",
-                "Hyderabad": "hyderabad",
-                "Pune": "pune",
-                "Ahmedabad": "ahmedabad",
+                "Delhi": "delhi", "Mumbai": "mumbai", "Bangalore": "bangalore",
+                "Kolkata": "kolkata", "Chennai": "chennai", "Hyderabad": "hyderabad",
+                "Pune": "pune", "Ahmedabad": "ahmedabad",
             }
             
             city_code = city_map.get(city, city.lower())
@@ -33,7 +26,6 @@ class IQAirAPI:
                 data = response.json()
                 if data.get("status") == "ok":
                     current_data = data["data"]["current"]["pollution"]
-                    
                     return {
                         "city": city,
                         "timestamp": datetime.now().isoformat(),
@@ -46,27 +38,15 @@ class IQAirAPI:
                         "O3": current_data.get("o3"),
                         "AQI": current_data.get("aqius"),
                     }
-            
-            print(f"Error fetching IQAir data for {city}: {response.status_code}")
             return None
-            
         except Exception as e:
-            print(f"Exception in IQAir fetch for {city}: {e}")
+            print(f"Error: {e}")
             return None
     
     def fetch_all_cities(self):
-        """Fetch data for all configured cities"""
         results = []
-        
         for city in CITIES.keys():
             data = self.fetch_city_data(city)
             if data:
                 results.append(data)
-        
         return results
-
-
-if __name__ == "__main__":
-    iqair = IQAirAPI()
-    data = iqair.fetch_all_cities()
-    print(json.dumps(data, indent=2))

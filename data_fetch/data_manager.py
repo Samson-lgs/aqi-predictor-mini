@@ -1,4 +1,3 @@
-
 import sqlite3
 import pandas as pd
 import numpy as np
@@ -8,6 +7,8 @@ import json
 from openweather_api import OpenWeatherAPI
 from iqair_api import IQAirAPI
 from cpcb_api import CPCBAPI
+import sys
+sys.path.append('..')
 from config.config import DATABASE_URL, CITIES
 
 class DataManager:
@@ -19,7 +20,6 @@ class DataManager:
         self.init_database()
     
     def init_database(self):
-        """Initialize SQLite database with schema"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
@@ -29,17 +29,8 @@ class DataManager:
                 city TEXT NOT NULL,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                 source TEXT,
-                pm2_5 REAL,
-                pm10 REAL,
-                no2 REAL,
-                so2 REAL,
-                co REAL,
-                o3 REAL,
-                aqi REAL,
-                temperature REAL,
-                humidity REAL,
-                pressure REAL,
-                wind_speed REAL,
+                pm2_5 REAL, pm10 REAL, no2 REAL, so2 REAL, co REAL, o3 REAL, aqi REAL,
+                temperature REAL, humidity REAL, pressure REAL, wind_speed REAL,
                 UNIQUE(city, timestamp, source)
             )
         """)
@@ -72,7 +63,6 @@ class DataManager:
         conn.close()
     
     def insert_aqi_data(self, data, source):
-        """Insert AQI data into database"""
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
@@ -85,36 +75,24 @@ class DataManager:
                          temperature, humidity, pressure, wind_speed)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
-                        record.get("city"),
-                        record.get("timestamp"),
-                        source,
-                        record.get("PM2.5"),
-                        record.get("PM10"),
-                        record.get("NO2"),
-                        record.get("SO2"),
-                        record.get("CO"),
-                        record.get("O3"),
-                        record.get("AQI"),
-                        record.get("temperature"),
-                        record.get("humidity"),
-                        record.get("pressure"),
-                        record.get("wind_speed"),
+                        record.get("city"), record.get("timestamp"), source,
+                        record.get("PM2.5"), record.get("PM10"), record.get("NO2"),
+                        record.get("SO2"), record.get("CO"), record.get("O3"),
+                        record.get("AQI"), record.get("temperature"), record.get("humidity"),
+                        record.get("pressure"), record.get("wind_speed"),
                     ))
-                except Exception as e:
-                    print(f"Error inserting record: {e}")
+                except:
+                    pass
             
             conn.commit()
             conn.close()
             print(f"Inserted {len(data)} records from {source}")
-        
         except Exception as e:
-            print(f"Database insertion error: {e}")
+            print(f"Error: {e}")
     
     def fetch_and_store_data(self):
-        """Fetch data from all APIs and store in database"""
         print(f"[{datetime.now()}] Starting data fetch...")
         
-        # Fetch from OpenWeather
         try:
             print("Fetching from OpenWeather...")
             ow_data = self.openweather.fetch_all_cities()
@@ -125,7 +103,6 @@ class DataManager:
         except Exception as e:
             print(f"OpenWeather error: {e}")
         
-        # Fetch from IQAir
         try:
             print("Fetching from IQAir...")
             iqair_data = self.iqair.fetch_all_cities()
@@ -134,7 +111,6 @@ class DataManager:
         except Exception as e:
             print(f"IQAir error: {e}")
         
-        # Fetch from CPCB
         try:
             print("Fetching from CPCB...")
             cpcb_data = self.cpcb.fetch_station_data()
@@ -146,7 +122,6 @@ class DataManager:
         print(f"[{datetime.now()}] Data fetch completed!")
     
     def get_training_data(self, days=30):
-        """Retrieve historical data for model training"""
         conn = sqlite3.connect(self.db_path)
         query = f"""
             SELECT * FROM aqi_data 
@@ -158,7 +133,6 @@ class DataManager:
         return df
     
     def export_to_csv(self, filename="aqi_data.csv"):
-        """Export data to CSV file"""
         try:
             df = self.get_training_data(days=30)
             df.to_csv(filename, index=False)
@@ -166,17 +140,7 @@ class DataManager:
         except Exception as e:
             print(f"Export error: {e}")
 
-
 if __name__ == "__main__":
     dm = DataManager()
-    
-    # Fetch data immediately
     dm.fetch_and_store_data()
-    
-    # Export to CSV for training
     dm.export_to_csv("data/processed/aqi_data.csv")
-    
-    # Continuous fetch (comment out for one-time execution)
-    # while True:
-    #     dm.fetch_and_store_data()
-    #     time.sleep(3600)  # Fetch every hour
