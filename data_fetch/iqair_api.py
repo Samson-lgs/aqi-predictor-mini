@@ -1,6 +1,9 @@
 import requests
 import json
 from datetime import datetime
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.config import IQAIR_API_KEY, CITIES
 
 class IQAirAPI:

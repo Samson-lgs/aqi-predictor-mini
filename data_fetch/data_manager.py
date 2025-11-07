@@ -4,11 +4,12 @@ import numpy as np
 from datetime import datetime, timedelta
 import time
 import json
-from openweather_api import OpenWeatherAPI
-from iqair_api import IQAirAPI
-from cpcb_api import CPCBAPI
 import sys
-sys.path.append('..')
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from data_fetch.openweather_api import OpenWeatherAPI
+from data_fetch.iqair_api import IQAirAPI
+from data_fetch.cpcb_api import CPCBAPI
 from config.config import DATABASE_URL, CITIES
 
 class DataManager:
